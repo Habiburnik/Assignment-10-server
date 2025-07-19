@@ -24,7 +24,15 @@ async function run() {
     await client.connect();
 
     const database = client.db("VisaVista");
-    const usersCollection = database.collection("visaDetails");
+    const visaCollection = database.collection("visaDetails");
+
+    // Add a new visa entry
+    app.post('/visa', async (req, res) => {
+        const visaData = req.body;
+        const result = await visaCollection.insertOne(visaData);
+        res.send(result);      
+    });
+
 
 
     // Send a ping to confirm a successful connection
@@ -38,10 +46,10 @@ async function run() {
 run().catch(console.dir);
 
 
-app.get('/', (req, res) =>{
-    res.send('Visa Management server is running')
-} )
+app.get('/', (req, res) => {
+  res.send('Visa Management server is running')
+})
 
-app.listen(port, ()=>{
-    console.log(`server is running on port : ${port}`)
+app.listen(port, () => {
+  console.log(`server is running on port : ${port}`)
 })
