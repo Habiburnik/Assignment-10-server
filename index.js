@@ -26,13 +26,36 @@ async function run() {
     const database = client.db("VisaVista");
     const visaCollection = database.collection("visaDetails");
 
+    const applicationCollection = database.collection("applications");
+
     // Add a new visa entry
     app.post('/visa', async (req, res) => {
-        const visaData = req.body;
-        const result = await visaCollection.insertOne(visaData);
-        res.send(result);      
+      const visaData = req.body;
+      const result = await visaCollection.insertOne(visaData);
+      res.send(result);
     });
 
+    app.get('/visa/:id', async (req, res) => {
+      const id = req.params.id;
+      const visa = await visaCollection.findOne({ _id: new ObjectId(id) });
+      if (!visa) {
+        return res.status(404).send({ message: 'Visa not found' });
+      }
+
+      res.send(visa);
+    });
+
+    app.post('/applications', async (req, res) => {
+        const newApplication = req.body;
+        const result = await applicationCollection.insertOne(newApplication);
+        res.send(result);
+    });
+
+
+    app.get('/visa', async (req, res) => {
+      const result = await visaCollection.find().toArray();
+      res.send(result);
+    });
 
 
     // Send a ping to confirm a successful connection
