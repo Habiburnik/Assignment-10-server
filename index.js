@@ -74,10 +74,18 @@ async function run() {
     });
 
     app.get('/my-visas', async (req, res) => {
-      const email = req.query.email;
-      const result = await client.db("VisaVista").collection("visaDetails").find({ addedBy: email }).toArray();
+      const addedBy = req.query.added_by;
+      if (!addedBy) {
+        return res.status(400).send({ message: 'added_by query is required' });
+      }
+      const result = await client
+        .db("VisaVista")
+        .collection("visaDetails")
+        .find({ added_by: addedBy }) // ✅ exact match
+        .toArray();
       res.send(result);
     });
+
 
     app.get('/visa', async (req, res) => {
       const result = await visaCollection.find().toArray();
