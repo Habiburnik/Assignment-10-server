@@ -29,11 +29,7 @@ async function run() {
     const applicationCollection = database.collection("applications");
 
     // Add a new visa entry
-    app.post('/visa', async (req, res) => {
-      const visaData = req.body;
-      const result = await visaCollection.insertOne(visaData);
-      res.send(result);
-    });
+
 
     app.get('/visa/:id', async (req, res) => {
       const id = req.params.id;
@@ -45,11 +41,38 @@ async function run() {
       res.send(visa);
     });
 
-    app.post('/applications', async (req, res) => {
-        const newApplication = req.body;
-        const result = await applicationCollection.insertOne(newApplication);
+    app.get('/applications', async (req, res) => {
+      try {
+        const userEmail = req.query.email;
+        if (!userEmail) {
+          return res.status(400).send({ error: 'Email is required' });
+        }
+
+        const result = await database
+          .collection('applications')
+          .find({ email: userEmail })
+          .toArray();
+
         res.send(result);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: 'Failed to fetch applications' });
+      }
     });
+
+    app.post('/visa', async (req, res) => {
+      const visaData = req.body;
+      const result = await visaCollection.insertOne(visaData);
+      res.send(result);
+    });
+
+    app.post('/applications', async (req, res) => {
+      const application = req.body;
+        const result = await applicationCollection.insertOne(application);
+        res.send({ insertedId: result.insertedId });
+
+    });
+
 
 
     app.get('/visa', async (req, res) => {
