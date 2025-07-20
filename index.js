@@ -68,16 +68,37 @@ async function run() {
 
     app.post('/applications', async (req, res) => {
       const application = req.body;
-        const result = await applicationCollection.insertOne(application);
-        res.send({ insertedId: result.insertedId });
+      const result = await applicationCollection.insertOne(application);
+      res.send({ insertedId: result.insertedId });
 
     });
 
-
+    app.get('/my-visas', async (req, res) => {
+      const email = req.query.email;
+      const result = await client.db("VisaVista").collection("visaDetails").find({ addedBy: email }).toArray();
+      res.send(result);
+    });
 
     app.get('/visa', async (req, res) => {
       const result = await visaCollection.find().toArray();
       res.send(result);
+    });
+
+    app.put('/visa/:id', async (req, res) => {
+      const { id } = req.params;
+      const updatedVisa = req.body;
+        const result = await visaCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: updatedVisa }
+        );
+        res.send(result);
+    });
+
+    // Delete visa by ID
+    app.delete('/visa/:id', async (req, res) => {
+      const { id } = req.params;
+        const result = await visaCollection.deleteOne({ _id: new ObjectId(id) });
+        res.send(result);
     });
 
 
