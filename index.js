@@ -87,22 +87,37 @@ async function run() {
     app.put('/visa/:id', async (req, res) => {
       const { id } = req.params;
       const updatedVisa = req.body;
-        const result = await visaCollection.updateOne(
-          { _id: new ObjectId(id) },
-          { $set: updatedVisa }
-        );
-        res.send(result);
+      const result = await visaCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updatedVisa }
+      );
+      res.send(result);
     });
 
-    // Delete visa by ID
+
+    app.delete('/applications/:id', async (req, res) => {
+      const { id } = req.params;
+      try {
+        const result = await database
+          .collection('applications')
+          .deleteOne({ _id: new ObjectId(id) });
+
+        res.send(result);
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ error: 'Failed to delete application' });
+      }
+    });
+
+
     app.delete('/visa/:id', async (req, res) => {
       const { id } = req.params;
-        const result = await visaCollection.deleteOne({ _id: new ObjectId(id) });
-        res.send(result);
+      const result = await visaCollection.deleteOne({ _id: new ObjectId(id) });
+      res.send(result);
     });
 
 
-    // Send a ping to confirm a successful connection
+
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
